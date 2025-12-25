@@ -6,11 +6,15 @@ import com.smart.hotel.auth.dto.UserRegisterRequest;
 import com.smart.hotel.auth.dto.UserResponse;
 import com.smart.hotel.auth.entity.User;
 import com.smart.hotel.auth.repository.UserRepository;
+import com.smart.hotel.auth.security.CustomUserDetails;
 import com.smart.hotel.auth.security.JwtUtil;
 import com.smart.hotel.auth.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +22,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    private final AuthenticationManager authenticationManager;
 
     private final JwtUtil jwtUtil;
 
@@ -48,21 +54,35 @@ public class UserServiceImpl implements UserService {
     @Override
     public LoginResponse login(LoginRequest request) {
 
-        User user = userRepository.findByMobile(request.getMobile())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+//        --not needed if using  Authentication auth
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
-        }
+//        User user = userRepository.findByMobile(request.getMobile())
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+//            throw new RuntimeException("Invalid credentials");
+//        }
+//
+//        if (!user.isActive()) {
+//            throw new RuntimeException("User is inactive");
+//        }
 
-        if (!user.isActive()) {
-            throw new RuntimeException("User is inactive");
-        }
+        Authentication auth =
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                request.getMobile(),
+                                request.getPassword()
+                        )
+                );
 
-        String token = jwtUtil.generateToken(
-                user.getMobile(),
-                user.getRole().name()
-        );
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+        User user = userDetails.getUser();
+
+        System.out.println("--userDetails "+ userDetails.toString());
+        System.out.println("--user "+ user.toString());
+        System.out.println("--auth "+ auth);
+
+        String token = jwtUtil.generateToken(auth);
         return new LoginResponse(
                 user.getId(),
                 user.getName(),

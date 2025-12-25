@@ -4,7 +4,6 @@ import com.smart.hotel.auth.dto.LoginRequest;
 import com.smart.hotel.auth.dto.LoginResponse;
 import com.smart.hotel.auth.dto.UserRegisterRequest;
 import com.smart.hotel.auth.dto.UserResponse;
-import com.smart.hotel.auth.entity.User;
 import com.smart.hotel.auth.service.UserService;
 import com.smart.hotel.dto.ApiResponse;
 import jakarta.validation.Valid;
@@ -38,6 +37,12 @@ public class AuthController {
     @GetMapping("/admin/test")
     public String adminTest() {
         return "Admin Access Granted";
+    }
+
+    @GetMapping("/admin/report")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String getReport() {
+        return "report";
     }
 
 
