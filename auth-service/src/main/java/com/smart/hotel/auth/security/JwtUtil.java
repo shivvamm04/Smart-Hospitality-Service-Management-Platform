@@ -1,5 +1,6 @@
 package com.smart.hotel.auth.security;
 
+import com.smart.hotel.auth.enums.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,10 +24,10 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public String generateToken(String mobile, String role) {
+    public String generateToken(String mobile, Role role) {
         return Jwts.builder()
                 .setSubject(mobile)
-                .claim("role", role)
+                .claim("role", "ROLE_"+role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -55,7 +56,7 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .setSubject(mobile)
-                .claim("role", role)
+                .claim("role", "ROLE_" +role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

@@ -23,7 +23,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        System.out.println("-- inside filterchanin config");
+        System.out.println("-- inside filter chain config");
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
@@ -34,8 +34,15 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/auth/login",
                                         "/auth/register",
-                                        "/auth/refresh"
+                                        "/auth/refresh",
+                                        "/auth/logout",
+                                        "/auth/logout-all"
                                 ).permitAll()
+
+                                .requestMatchers(
+                                        "/auth/logout",
+                                        "/auth/logout-all")
+                                .authenticated()
 
                                 // Admin APIs
                                 .requestMatchers("/admin/**").hasRole("ADMIN")

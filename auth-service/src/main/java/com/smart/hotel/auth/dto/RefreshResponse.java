@@ -6,11 +6,11 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class LoginResponse {
+public class RefreshResponse {
     private Long userId;
     private String name;
     private String mobile;
     private Role role;
     private String token;
-    private String refreshToken;
+    private String newRefreshToken;
 }
