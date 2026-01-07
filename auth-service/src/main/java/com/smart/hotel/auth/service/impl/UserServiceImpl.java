@@ -11,6 +11,7 @@ import com.smart.hotel.auth.security.CustomUserDetails;
 import com.smart.hotel.auth.security.JwtUtil;
 import com.smart.hotel.auth.service.RefreshTokenService;
 import com.smart.hotel.auth.service.UserService;
+import com.smart.hotel.event.UserEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,6 +28,9 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final AuthenticationManager authenticationManager;
+
+    @Autowired
+    private final UserEventPublisher userEventPublisher;
 
     private final JwtUtil jwtUtil;
 
@@ -49,6 +53,9 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         User savedUser = userRepository.save(user);
+
+        //EVENT (mocked)
+        userEventPublisher.publishUserRegistered(user.getId());
 
         return new UserResponse(
                 savedUser.getId(),
